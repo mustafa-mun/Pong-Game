@@ -162,7 +162,6 @@ class Ball {
       ball.velocity.y = -4
        // If ball hits the bottom of the screen
     }
-gi
   }
 
   update() {
