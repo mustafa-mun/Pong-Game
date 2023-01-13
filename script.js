@@ -1,11 +1,13 @@
 const canvas = document.querySelector('canvas');
 const c = canvas.getContext('2d');
 
+
 canvas.width = innerWidth;
 canvas.height = innerHeight
 
 let playerOneScore = 0;
 let playerTwoScore = 0;
+let startMsg2 = 'You can use W,A and ArrowUp,ArrowDown for controls'
 let startMsg = 'First 6 score wins. Press any key to start the game';
 let isGameStarted = false;
 let isGameFinished = false;
@@ -14,8 +16,10 @@ let isGameFinished = false;
 const startGame = () => {
   if(!isGameFinished && !isGameStarted){
       startMsg = '';
+      startMsg2 = '';
       ball.randomStart();
       isGameStarted = true;
+      isGameFinished = false;
   }
 }
 
@@ -30,7 +34,7 @@ const keys = {
     pressed:false
   },
   arrowDown:{
-    pressed:false 
+    pressed:false
   }
 }
 
@@ -39,7 +43,7 @@ class Player {
   constructor(x) {
     this.size = {
       width: 20,
-      height: 170
+      height: 182
     }
     this.position = {
       x: x,
@@ -48,10 +52,10 @@ class Player {
     this.velocity = {
       y:0
     }
-    
+
   }
 
-  
+
   draw() {
     c.fillStyle = 'white';
     c.fillRect(this.position.x, this.position.y, this.size.width, this.size.height)
@@ -60,6 +64,7 @@ class Player {
   update() {
     this.position.y += this.velocity.y;
     this.draw();
+    console.log();
   }
 }
 
@@ -85,36 +90,79 @@ class Ball {
     c.fill();
     c.stroke();
 
+    const pongMiddle = playerOne.position.y + playerOne.size.height / 2;
+    const pong2Middle = playerTwo.position.y + playerTwo.size.height / 2;
 
     if(ball.position.x < 5 && !ball.position.y >= !playerOne.position.y && !ball.position.y <= !playerOne.position.y + playerOne.size.height) {
-        playerTwoScore ++
-        refreshBall()
-    }
-
-    if(ball.position.x > canvas.width - 2 && !ball.position.y >= !playerTwo.position.y && !ball.position.y <= !playerTwo.position.y + playerTwo.size.height) {
-        playerOneScore ++
-        refreshBall()
+      playerTwoScore ++ // When player Two scores
+      refreshBall()
+    } else if(ball.position.x > canvas.width - 2 && !ball.position.y >= !playerTwo.position.y && !ball.position.y <= !playerTwo.position.y + playerTwo.size.height) {
+      playerOneScore ++ // When player One scores
+      refreshBall()
     }
 
     if(ball.position.x <= playerOne.size.width + ball.radius && ball.position.y >= playerOne.position.y && ball.position.y <= playerOne.position.y + playerOne.size.height) { // BALL COLLOSİON
-      ball.velocity.x = 7
-      console.log('player one hitted the ball');
+      ball.velocity.x = 10 // When player One hits the ball (ball speed)
+    } else if(ball.position.x > canvas.width - playerTwo.size.width - ball.radius && ball.position.y >= playerTwo.position.y && ball.position.y <= playerTwo.position.y + playerTwo.size.height) {
+      ball.velocity.x = -10 // When player Two hits the ball (ball speed)
     }
-    if(ball.position.x > canvas.width - playerTwo.size.width - ball.radius && ball.position.y >= playerTwo.position.y && ball.position.y <= playerTwo.position.y + playerTwo.size.height) {
-      ball.velocity.x = -7
-      console.log('player two hitted the ball');
+
+
+    // Player One ball angle collasion
+    if(ball.position.x <= playerOne.size.width + ball.radius && ball.position.y > pongMiddle - 13 && ball.position.y < pongMiddle + 13) {
+      ball.velocity.y = 0;
+    } else if(ball.position.x <= playerOne.size.width + ball.radius && ball.position.y > pongMiddle + 13 && ball.position.y < pongMiddle + 39) {
+      const p = [-2.5,-3]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    } else if(ball.position.x <= playerOne.size.width + ball.radius && ball.position.y > pongMiddle + 39 && ball.position.y < pongMiddle + 65) {
+      const p = [-3.5,-4]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    } else if(ball.position.x <= playerOne.size.width + ball.radius && ball.position.y > pongMiddle + 65 && ball.position.y < pongMiddle + 91) {
+      const p = [-4.5,-5]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    } else if(ball.position.x <= playerOne.size.width + ball.radius && ball.position.y < pongMiddle - 13 && ball.position.y > pongMiddle - 39) {
+      const p = [2.5,3]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    } else if(ball.position.x <= playerOne.size.width + ball.radius && ball.position.y < pongMiddle - 39 && ball.position.y > pongMiddle - 65) {
+      const p = [3.5,4]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    }else if(ball.position.x <= playerOne.size.width + ball.radius && ball.position.y < pongMiddle - 65 && ball.position.y > pongMiddle - 91) {
+      const p = [4.5,5]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
     }
-  
+
+
+    // Player Two ball angle collasion
+    if(ball.position.x > canvas.width - playerTwo.size.width - ball.radius && ball.position.y > pong2Middle - 13 && ball.position.y < pong2Middle + 13) {
+      ball.velocity.y = 0;
+    } else if(ball.position.x > canvas.width - playerTwo.size.width - ball.radius && ball.position.y > pong2Middle + 13 && ball.position.y < pong2Middle + 39) {
+      const p = [-2.5,-3]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    } else if(ball.position.x > canvas.width - playerTwo.size.width - ball.radius && ball.position.y > pong2Middle + 39 && ball.position.y < pong2Middle + 65) {
+      const p = [-3.5,-4]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    } else if(ball.position.x > canvas.width - playerTwo.size.width - ball.radius && ball.position.y > pong2Middle + 65 && ball.position.y < pong2Middle + 91) {
+      const p = [-4.5,-5]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    } else if(ball.position.x > canvas.width - playerTwo.size.width - ball.radius && ball.position.y < pong2Middle - 13 && ball.position.y > pong2Middle - 39) {
+      const p = [2.5,3]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    } else if(ball.position.x > canvas.width - playerTwo.size.width - ball.radius && ball.position.y < pong2Middle - 39 && ball.position.y > pong2Middle - 65) {
+      const p = [3.5,4]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    } else if(ball.position.x > canvas.width - playerTwo.size.width - ball.radius && ball.position.y < pong2Middle - 65 && ball.position.y > pong2Middle - 91) {
+      const p = [4.5,5]
+      ball.velocity.y = p[Math.floor(Math.random() * 2)];
+    }
+
+
     if(ball.position.y < 5) {
-      ball.velocity.y = 6
+      ball.velocity.y = 4 // If ball hits the top of the screen
+    } else if(ball.position.y >= canvas.height ){
+      ball.velocity.y = -4
+       // If ball hits the bottom of the screen
     }
-    if(ball.position.y >= canvas.height ){
-      ball.velocity.y = -6
-    }
-
-   
-    
-
+gi
   }
 
   update() {
@@ -124,11 +172,9 @@ class Ball {
   }
 
   randomStart() {
-    const randomDirection = [3,-3,4,-4]
-    const randomIndex1 = Math.floor(Math.random() * 4);
-    const randomIndex2 = Math.floor(Math.random() * 4);
-    this.velocity.x = randomDirection[randomIndex1]
-    this.velocity.y = randomDirection[randomIndex2]
+    const randomX = [-5,5]
+    const randomIndex = Math.floor(Math.random() * 2);
+    this.velocity.x = randomX[randomIndex]
   }
 }
 
@@ -146,34 +192,38 @@ const animate  = () => {
   ball.update()
 
   if(keys.s.pressed && playerOne.position.y + playerOne.size.height <= canvas.height) { // Player movement
-    playerOne.velocity.y = 5
+    playerOne.velocity.y = 6
   } else{
     playerOne.velocity.y = 0
   }
 
   if(keys.w.pressed && playerOne.position.y >= 7) {
-    playerOne.velocity.y = -5
+    playerOne.velocity.y = -6
   }
 
   if(keys.arrowDown.pressed && playerTwo.position.y + playerTwo.size.height <= canvas.height) {
-    playerTwo.velocity.y = 5
+    playerTwo.velocity.y = 6
   } else{
     playerTwo.velocity.y = 0
   }
 
   if(keys.arrowUp.pressed && playerTwo.position.y >= 7) {
-    playerTwo.velocity.y = -5
-  }  
+    playerTwo.velocity.y = -6
+  }
 
-  c.font = '46px sans-serif';
+
+
+  c.font = '46px sans-serif'; // Scores and start msg
   c.fillStyle = 'white';
   c.textAlign = 'center';
   c.textBaseline = 'middle';
   c.fillText('Player 1: ' + playerOneScore, 355,100);
   c.fillText('Player 2: ' + playerTwoScore, canvas.width - 355,100);
   c.fillText(startMsg, canvas.width/2, canvas.height/2 - 100)
+  c.fillText(startMsg2, canvas.width/2, canvas.height/2 - 175)
 
-  if(playerOneScore === 6) {
+
+  if(playerOneScore === 6) { // When one player reach the final score
     isGameStarted = false;
     startMsg = 'Player 1 Wins!, Press R if you want to play again.'
     ball.velocity.x = 0;
@@ -187,15 +237,10 @@ const animate  = () => {
     isGameFinished = true
   }
 
-  if(isGameFinished){
+  if(isGameFinished){ // Restart the game
     addEventListener('keydown', ( {key} ) => {
       if(key === 'r'){
-        isGameFinished = false;
-        startMsg = '';
-        playerOne.position.y = canvas.height / 2 - 90;
-        playerTwo.position.y = canvas.height / 2 - 90;
-        playerOneScore = 0;
-        playerTwoScore = 0;
+       refreshGame();
       }
     })
   }
@@ -206,7 +251,7 @@ const animate  = () => {
 animate()
 
 
-addEventListener('keydown', ( {key} ) => {
+addEventListener('keydown', ( {key} ) => { // Press any key to start game event listener
   if(key) {
     startGame()
   }
@@ -254,13 +299,24 @@ if(!isGameFinished) {
 
 
 
+const refreshBall = () => { // Refresh the balls position
+  playerOne.position.y = canvas.height / 2 - 90;
+  playerTwo.position.y = canvas.height / 2 - 90;
+  ball.velocity.y = 0;
+  ball.velocity.x = 0
+  ball.position.x = parseInt(canvas.width / 2)
+  ball.position.y = parseInt(canvas.height / 2)
+  ball.randomStart()
+}
 
-const refreshBall = () => {
-    ball.position.x = parseInt(canvas.width / 2)
-    ball.position.y = parseInt(canvas.height / 2)
-    ball.velocity.x = 4;
-    ball.velocity.y = 1
-    ball.randomStart()
+const refreshGame = () => {
+  isGameFinished = false;
+  startMsg = '';
+  startMsg2 = '';
+  playerOne.position.y = canvas.height / 2 - 90;
+  playerTwo.position.y = canvas.height / 2 - 90;
+  playerOneScore = 0;
+  playerTwoScore = 0;
 }
 
 
